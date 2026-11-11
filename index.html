@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Técnico - Compra e Vistoria do Imóvel</title>
+    <style>
+        :root {
+            --bg-main: #f8f9fa;
+            --text-color: #212529;
+            --primary-color: #1a365d;
+            --secondary-color: #2b6cb0;
+            --accent-color: #c53030;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --muted-text: #4a5568;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            text-align: justify;
+        }
+
+        strong {
+            color: #1a202c;
+        }
+
+        em {
+            color: #4a5568;
+            font-style: italic;
+        }
+
+        .obs {
+            background-color: #edf2f7;
+            border-left: 4px solid var(--secondary-color);
+            padding: 0.8rem 1rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            color: var(--muted-text);
+        }
+
+        .alert-box {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--accent-color);
+            padding: 0.8rem 1rem;
+            margin: 1rem 0;
+            color: #742a2a;
+        }
+
+        /* Midias */
+        .media-container {
+            margin: 1.2rem 0;
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        img:hover {
+            transform: scale(1.01);
+            box-shadow: var(--shadow-md);
+        }
+
+        .img-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .img-grid img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        audio, video {
+            width: 100%;
+            max-width: 100%;
+            margin: 0.5rem 0;
+            border-radius: var(--radius);
+            outline: none;
+        }
+
+        video {
+            background-color: #000;
+            max-height: 450px;
+        }
+
+        /* Links e Lista de Documentos */
+        ul {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .doc-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            background-color: #edf2f7;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            font-weight: 500;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .doc-link:hover {
+            background-color: #e2e8f0;
+            color: var(--secondary-color);
+        }
+
+        .doc-link::before {
+            content: "📄";
+            margin-right: 8px;
+        }
+
+        .btn-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .btn-link:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Modal Lightbox para imagens */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90vh;
+            border: none;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Player personalizado de Audio */
+        .audio-wrapper {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin: 0.8rem 0;
+        }
+
+        .audio-wrapper label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--muted-text);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0.5rem;
+            }
+            .container {
+                padding: 1.2rem;
+            }
+            .img-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <style id="estilo-padrao">
+        :root {
+            color-scheme: light;
+            --cor-fundo: #f4f6f8;
+            --cor-superficie: #ffffff;
+            --cor-texto: #202a35;
+            --cor-secundaria: #586574;
+            --cor-primaria: #24476a;
+            --cor-primaria-hover: #183550;
+            --cor-borda: #d8dee6;
+            --sombra: 0 2px 8px rgba(20, 35, 50, .07);
+            --raio: 6px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background: var(--cor-fundo);
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            background: var(--cor-fundo);
+            color: var(--cor-texto);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        body > nav,
+        body > h1,
+        body > h2,
+        body > h3,
+        body > p,
+        body > ul,
+        body > ol,
+        body > section,
+        body > main,
+        body > .container {
+            max-width: 1080px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        nav {
+            margin: 0 auto 28px;
+            padding: 12px 18px;
+            background: var(--cor-superficie);
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+        }
+
+        nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 22px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav a,
+        a {
+            color: var(--cor-primaria);
+            text-decoration: none;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 5px 0;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: var(--cor-primaria-hover);
+            text-decoration: underline;
+        }
+
+        h1, h2, h3, h4 {
+            color: #1d2b39;
+            line-height: 1.25;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-size: clamp(1.7rem, 3vw, 2.25rem);
+        }
+
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--cor-borda);
+            font-size: 1.4rem;
+        }
+
+        h3 {
+            margin-top: 22px;
+            font-size: 1.12rem;
+        }
+
+        p, li {
+            color: var(--cor-texto);
+        }
+
+        p {
+            margin: 0 0 16px;
+        }
+
+        ul, ol {
+            padding-left: 26px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        img, video, iframe {
+            max-width: 100%;
+        }
+
+        img {
+            height: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--cor-superficie);
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid var(--cor-borda);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #edf1f5;
+            font-weight: 700;
+        }
+
+        button, .btn-link {
+            padding: 9px 15px;
+            border: 1px solid var(--cor-primaria);
+            border-radius: 4px;
+            background: var(--cor-primaria);
+            color: #fff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover, .btn-link:hover {
+            background: var(--cor-primaria-hover);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        input, select, textarea {
+            max-width: 100%;
+            padding: 9px 10px;
+            border: 1px solid #bdc7d2;
+            border-radius: 4px;
+            background: #fff;
+            color: var(--cor-texto);
+            font: inherit;
+        }
+
+        :focus-visible {
+            outline: 3px solid rgba(36, 71, 106, .28);
+            outline-offset: 2px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--cor-borda);
+            margin: 24px 0;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            nav {
+                padding: 10px 12px;
+            }
+
+            nav ul {
+                gap: 6px 14px;
+            }
+
+            h1 {
+                margin-bottom: 18px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: #fff;
+                color: #000;
+            }
+
+            nav {
+                display: none;
+            }
+
+            a {
+                color: #000;
+                text-decoration: underline;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+    <nav aria-label="Navegação principal">
+        <ul>
+            <li><a href="./galeria.html" target="_blank">Galeria geral</a></li>
+          <!--  <li><a href="./04/index.html" target="_blank">Galeria</a></li> -->
+            <li><a href="./02/thiago/index.html" target="_blank">Thiago</a></li>
+            <li><a href="./02/alberto/index.html" target="_blank">Alberto</a></li>
+            <li><a href="./02/paulo/index.html" target="_blank">Paulo</a></li>
+            <li><a href="./04/defeitos.html" target="_blank">Defeitos do imóvel</a></li>
+        </ul>
+    </nav>
+
+
+
+    <div class="container">
+        <h1>Compra de uma casa</h1>
+        
+        <div class="media-container">
+            <img src="./imagens/casa.png" alt="Foto da Casa" class="zoomable">
+        </div>
+
+        <h2>Vendedor</h2>
+
+        <h2>Sócio Administrador da Master Engenharia LTDA</h2>
+        <div class="media-container">
+            <img src="./imagens/img01.png" alt="Sócio Administrador" class="zoomable">
+        </div>
+
+        <h2>Retirou o nome da sociedade!</h2>
+        <div class="media-container">
+            <img src="./imagens/img02.png" alt="Consulta do Quadro Societário" class="zoomable">
+        </div>
+
+        <p class="obs">
+            <strong>Obs.:</strong> Conforme verificado na consulta, o senhor <strong>PAULO HENRIQUE AZEVEDO DA SILVA</strong> retirou o nome do quadro societário da empresa Master Engenharia LTDA.
+        </p>
+
+        <h2>Contratos e Documentos</h2>
+
+        <div>
+            <ul>
+                <li><a class="doc-link" href="./doc/cont_assinado.pdf" target="_blank">Contrato particular de compra e venda</a></li>
+                <li><a class="doc-link" href="./doc/cont_casa_anexo.pdf" target="_blank">Habitação - Meu Imóvel</a></li>
+                <li><a class="doc-link" href="./doc/contrato_casa.pdf" target="_blank">Anexo I - Direitos e Deveres do seu Contrato</a></li>
+                <li><a class="doc-link" href="./doc/certidao.pdf" target="_blank">Certidão</a></li>
+                <li><a class="doc-link" href="./doc/certidao_1.pdf" target="_blank">Certidão de Inteiro Teor</a></li>
+                <li><a class="doc-link" href="./doc/anexo_01.pdf" target="_blank">Habitação - Meu Imóvel (Anexo)</a></li>
+            </ul>
+        </div>
+
+        <p>
+            Ao realizar a visita ao imóvel e confirmar a compra, informei que tinha bastante pressa pois já estava me preparando para fazer uma cirurgia de hernioplastia inguinal e por estar com receio de ser demitido devido não ter um bom entendimento com a nova gerente e, sendo demitido, não conseguir fazer o financiamento. Ficou acertado que a casa seria entregue, no máximo no início de março de 2025. O corretor me informou que dava para entregar bem antes, pois o mais difícil já havia sido feito, que o restante era só acabamento.
+        </p>
+
+        <p>
+            Após a assinatura do contrato em <strong>07 de fevereiro de 2025</strong>, após isso só tive informação do andamento do processo em <strong>26 de fevereiro de 2025</strong>, pois eu entrei em contato com o corretor pelo Whatsapp. No áudio enviado pelo corretor Thiago Menezes, fui informado que devido à mudança de governo (Timon-MA) e por ser feriado estaria complicado até para solicitar um engenheiro.
+        </p>
+
+        <p>
+            Novamente cessaram as comunicações e em <strong>14 de março de 2025</strong>, após eu entrar em contato com o corretor, fui informado do seguinte:<br>
+            <em>"Que o Prefeito de Timon estaria exigindo uma <strong>'outorga'</strong>, algo que não era obrigado a fazer"</em>
+        </p>
+        <div class="audio-wrapper">
+            <label>Áudio - Exigência de Outorga (14/03/2025):</label>
+            <audio src="./media/PTT-20250314-WA0004.opus" controls preload="metadata"></audio>
+        </div>
+
+        <p class="obs">
+            <strong>Dúvida:</strong> Essa <em>'outorga'</em> realmente não era obrigatória e foi tornada obrigatória pelo Governo de Timon-MA somente no início do ano de 2025?
+        </p>
+
+        <p>
+            Ainda em <strong>14 de março de 2025</strong> o corretor me encaminhou um áudio onde o vendedor Paulo informa que já havia dado entrada nesta documentação, que já havia instalado a <strong>cerca elétrica</strong> e que em <strong>15 dias</strong> a casa estaria pronta.
+        </p>
+        <div class="audio-wrapper">
+            <label>Áudio - Previsão de entrega e Cerca Elétrica (14/03/2025):</label>
+            <audio src="./media/AUD-20250314-WA0007.opus" controls preload="metadata"></audio>
+        </div>
+
+        <p>
+            Do dia <strong>14 de março</strong> até o dia <strong>03 de abril</strong> não entraram em contato comigo. Então, eu entrei em contato com o corretor, e o informado foi que ainda era a questão da "outorga".
+        </p>
+        <div class="audio-wrapper">
+            <label>Áudio - Atualização Outorga Parte 1 (03/04/2025):</label>
+            <audio src="./media/PTT-20250403-WA0007.opus" controls preload="metadata"></audio>
+        </div>
+        <div class="audio-wrapper">
+            <label>Áudio - Atualização Outorga Parte 2 (03/04/2025):</label>
+            <audio src="./media/PTT-20250403-WA0008.opus" controls preload="metadata"></audio>
+        </div>
+
+        <p class="alert-box">
+            Lembrando que, em caso de desistência, seria necessário pagar uma multa no valor de 5% do valor do contrato.<br>
+            <img src="./imagens/multa.png" alt="Cláusula de Multa Contratual" class="zoomable">
+        </p>
+
+        <p>
+            Segundo o contrato que eu tive que assinar para dar continuidade ao negócio, e confiando na palavra do corretor e do vendedor, lá informava o prazo de até 90 dias.<br>
+            <img src="./imagens/prazo_entrega.png" alt="Prazo de Entrega em Contrato" class="zoomable">
+        </p>
+
+        <p>
+            No dia <strong>30 de abril</strong> o corretor me informa que saiu a documentação, agora só faltava colocar o mármore, <strong>limpar</strong> e chamar o engenheiro.
+        </p>
+        <div class="audio-wrapper">
+            <label>Áudio - Documentação liberada (30/04/2025):</label>
+            <audio src="./media/PTT-20250430-WA0034.opus" controls preload="metadata"></audio>
+        </div>
+
+        <h2>Fui desligado da empresa</h2>
+        <p>
+            No dia <strong>09 de maio</strong> fui demitido horas após informar ao R.H que eu me ausentaria no final do mês devido à necessidade de ser operado cirurgicamente. A liberação do médico para retorno às atividades laborais seria somente após 60 dias. Agora eu me encontrava operado e desempregado.
+        </p>
+
+        <p>
+            Em <strong>09 de agosto</strong> o corretor entra em contato para perguntar qual era a previsão para eu voltar a trabalhar, pois ele, corretor, <strong>não sabia se o vendedor poderia esperar mais tempo</strong> e me propondo para desistir do imóvel e que no lugar dele poderia ser construída uma outra casa em um outro terreno próximo.
+        </p>
+        <div class="audio-wrapper">
+            <label>Áudio - Proposta de Troca de Imóvel (09/08/2025):</label>
+            <audio src="./media/PTT-20250809-WA0004.opus" controls preload="metadata"></audio>
+        </div>
+
+        <p class="obs">
+            <strong>Obs.:</strong> Yago é meu cunhado. Foi ele quem me indicou o corretor e que me indicou para trabalhar na empresa onde trabalho hoje.<br><br>
+            <strong>Obs. 1:</strong> Como aceitar cancelar um negócio de um imóvel que estava praticamente acabado e que não havia sido entregue por mais de 90 dias por um imóvel do zero, apenas o terreno?
+        </p>
+
+        <div class="img-grid">
+            <img src="./imagens/IMG-20250128-WA0041.jpg" alt="Foto da Casa em Construção 1" class="zoomable">
+            <img src="./imagens/IMG-20250128-WA0034.jpg" alt="Foto da Casa em Construção 2" class="zoomable">
+            <img src="./imagens/IMG-20250128-WA0035.jpg" alt="Foto da Casa em Construção 3" class="zoomable">
+        </div>
+
+        <p class="obs">
+            <strong>Obs.:</strong> Repare que nas fotos já havia a cerca elétrica instalada nos 4 muros!
+        </p>
+
+        <p>Fui admitido novamente em outro emprego, e agora o corretor está com bastante pressa para que eu envie o novo contracheque e assine os papéis no <strong>correspondente bancário</strong>.</p>
+
+        <p>Ao ser perguntado se a casa estaria pronta, a resposta dele foi: <em>"Já tá terminada, já tá no ponto de limpar e te entregar."</em></p>
+        <div class="audio-wrapper">
+            <label>Áudio - Confirmação de Casa Pronta (10/11/2025):</label>
+            <audio src="./media/PTT-20251110-WA0004.opus" controls preload="metadata"></audio>
+        </div>
+        <div class="audio-wrapper">
+            <label>Áudio - Detalhes da Entrega (10/11/2025):</label>
+            <audio src="./media/PTT-20251110-WA0020.opus" controls preload="metadata"></audio>
+        </div>
+
+        <h2>Dia 19 de novembro, dia de assinar contrato na Caixa Econômica Federal</h2>
+        <div class="media-container">
+            <img src="./imagens/print_WhatsApp.jpg" height alt="Print de Conversa WhatsApp Caixa" class="zoomable">
+        </div>
+
+        <p>
+            Assinei o contrato, o corretor me acompanhou até o guichê de atendimento, o vendedor ficou em um guichê ao lado apenas observando. Mostrei ao corretor algumas coisas que estavam diferentes do combinado e ele me falou para não me preocupar, que o valor continuaria os R$ 170.000,00.
+        </p>
+        <p>
+            Em uma ligação dias antes de assinar o contrato, o vendedor garantiu que me entregaria a casa, mesmo antes de receber o pagamento da Caixa Econômica. O que não ocorreu.
+        </p>
+        <p>
+            Assinei o contrato no dia 19 de novembro de 2025, após isso somente dia 12 de dezembro que tive notícias, porque entrei em contato. No dia 16 de dezembro o corretor me informou que no dia seguinte me entregaria a casa.
+        </p>
+
+        <h2>Dia da entrega da casa</h2>
+        <p>
+            No dia <strong>28 de janeiro de 2025</strong> o corretor me enviou um link do Instagram: <em>"Segue lá depois para vc acompanhar"</em>
+        </p>
+        <div class="media-container">
+            <video src="./media/video1.mp4" controls preload="metadata">Realizei meu sonho!</video>
+        </div>
+        <p>
+            <a href="https://www.instagram.com/reel/DDtIIe1usof/?igsh=MXhzM3RmMWM1a3gxbA==" target="_blank" class="btn-link">Ver Reel no Instagram (thiagomenezesimoveis)</a>
+        </p>
+
+        <h2>Agora o vídeo da entrega da minha casa</h2>
+        <p>Na data e horário combinado para a entrega da minha casa:</p>
+        <div class="media-container">
+            <video src="./media/VID-20251217-WA0021.mp4" controls preload="metadata"></video>
+        </div>
+
+        <h2>O mais interessante: O corretor fala que "eu não tinha vindo aqui não".</h2>
+        <p>Assinei o contrato pois falaram que o que fosse necessário fazer/corrigir eles fariam. Que não iriam sumir, afinal, eles estavam fazendo uma outra casa ao lado da minha.</p>
+        <p>Fora o que está visível, ainda existiam mais coisas que foram combinadas na hora de vender o imóvel a serem feitas:</p>
+        <ul>
+            <li>• A casinha do gás do lado externo da cozinha;</li>
+            <li>• Película espelhada na janela da sala;</li>
+            <li>• A pintura do piso na frente e lateral da casa.</li>
+        </ul>
+
+        <p>
+            Deixei a chave ao sair para o trabalho no outro dia para eles removerem os "entulhos", fazerem as correções e a limpeza. Apenas removeram o resto de material que deixaram e corrigiram algumas falhas no muro na frente da casa que eu tive que apontar, pois se eu não falasse iriam ficar daquele jeito mesmo.
+        </p>
+
+        <p class="alert-box">
+            <strong>Primeira noite:</strong> O Alberto deixou um buraco no teto e choveu!
+        </p>
+        <div class="media-container">
+            <video src="./media/teto.mp4" controls preload="metadata"></video>
+        </div>
+
+        <p>
+            Ao apontar os remendos de tinta na parede, disseram que era assim mesmo. Ao perguntar sobre as manchas escuras na parte inferior da parede, fui informado que era tinta fresca, o que na verdade já eram marcas de infiltração.
+        </p>
+        <p class="alert-box">
+            Um engenheiro, um corretor/construtor e um pedreiro/eletricista, todos profissionais em seus ramos trabalhando para enganar alguém desinformado.
+        </p>
+
+        <p>Resumindo, tem uma área de fotos e vídeos com os defeitos do imóvel.</p>
+        <p>
+            <a href="./defeitos.html" class="btn-link">Acessar Relatório de Defeitos</a>
+        </p>
+
+        <p>
+            Após tentar bastante com o encarregado, de ter deixado por vários dias a chave em poder deles para não fazerem nada... Após ver a casa que ainda estava finalizando a parte estrutural quando recebi a minha ser acabada, entregue e, por incrível que pareça, com a cerca elétrica que era minha já instalada na propriedade dele e funcionando.
+        </p>
+
+        <p>
+            Agora além dos itens faltantes, mau acabamento, itens danificados, temos a chuva. Com ela vêm as infiltrações, a água que entra pela porta da frente e da cozinha, que escorre pelas janelas.
+        </p>
+
+        <p>
+            O Paulo é engenheiro formado e tem uma construtora desde 2018, mas quando conversamos, me disse que não sabia dos defeitos, que a casa havia sido comprada de outra pessoa, que não poderia me dar garantia de nada nela. Falou que: <em>"Você sabe que pagou um preço barato nesta casa"</em>, sendo que quem deu o preço foi ele e o corretor. Eu comprei dele <strong>uma casa residencial, nova, nunca habitada!</strong>
+        </p>
+
+        <p>
+            Esta casa foi vendida por um engenheiro, avaliada por um engenheiro da Caixa Econômica Federal e aprovada. Porém a casa entra água quando chove!
+        </p>
+
+        <p>
+            O vendedor propôs, "já que ele não gostava de confusão", devolver o dinheiro que paguei de entrada e quitar minha dívida na Caixa em troca da casa. Isso quase após 01 ano de espera pela casa.
+        </p>
+
+        <h2>Após o envio de um arquivo contendo os defeitos em 12 de fevereiro de 2026 e solicitado que o vendedor viesse até a casa para que lhe fosse mostrado de perto a situação, ficou acertado que ele enviaria os funcionários dele para começar as correções.</h2>
+        <p>
+            <a class="doc-link" href="./doc/casa_relatorio.pdf" target="_blank">Relatório dos defeitos (PDF)</a>
+        </p>
+
+        <h2>Correções</h2>
+        <div class="media-container">
+            <video src="./media/muro.mp4" controls preload="metadata"></video>
+        </div>
+        <p>Com a ajuda dos funcionários da casa ao lado, o vendedor enviou os pedreiros dele para começar a correção das infiltrações.</p>
+
+        <div class="media-container">
+            <video src="./media/video2.mp4" controls preload="metadata"></video>
+        </div>
+        <p>
+            Os consertos iniciaram dia 03 de março de 2026, porém, eles "consertavam" uma coisa e bagunçavam outra, ou então, apenas tentavam me convencer que do jeito que estava era o correto.
+        </p>
+        <p>
+            Foram quinze dias direto de atrasos, faltas ao trabalho, sujeira e ainda faltava bastante coisa. Por vários dias me atrasei para o trabalho para entregar a chave e depois de entrar em contato ficar sabendo que fulano teve um problema, que cicrano não poderia ir hoje, ou então "deixa a chave ou deixa o portão aberto, pois vai um pedreiro ver uma infiltração na casa ao lado. Hoje não vão fazer nada aí, mas o pintor vai passar mais uma mão de sela trinco na parede do vizinho..."
+        </p>
+
+        <p>
+            Tem a casa do vizinho feita e vendida pela mesma pessoa que vendeu a minha casa. Pode-se inferir a má-fé por parte do vendedor para comigo simplesmente observando a casa construída ao lado. E mesmo assim, aconteceram coisas do tipo abaixo.
+        </p>
+
+        <div class="media-container">
+            <video src="./media/Vídeo_calha.mp4" controls preload="metadata"></video>
+        </div>
+
+        <p>
+            No dia <strong>18 de março de 2026</strong> após ser informado que em mais um dia não iria ninguém para fazer as correções, ou seja, das reclamações que começaram no dia <strong>18 de dezembro de 2025</strong> ou eu teria que aceitar, porque era assim mesmo que tinha que ser ou eu deveria esperar e torcer para nenhum dos funcionários dele ter algum imprevisto ou compromisso. Enquanto isso, devido eu já saber como funciona uma construção, eu ainda não havia feito a minha mudança, estava dormindo em uma rede ou no chão, lavando roupa na mão, usando algumas coisas velhas para não estragar os meus poucos móveis. Informei que procuraria ajuda e que viessem recolher o material deles (o que não fizeram).
+        </p>
+
+        <p>
+            Muito tempo após, encontrei o vendedor em uma das lojas da empresa onde trabalho. Ele me chamou e disse: <em>"Pode chamar um pedreiro para fazer as correções que eu pago."</em>
+        </p>
+
+        <p class="alert-box">
+            Como acreditar em alguma promessa dessa pessoa?<br>
+            Não é só pedreiro, ele, mais uma vez está tentando minimizar a situação e deixar mais um cliente no prejuízo.
+        </p>
+    </div>
+
+    <!-- Modal Lightbox -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close">&times;</span>
+        <img id="modalImg" src="" alt="Imagem Ampliada">
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Modal Lightbox para Imagens
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("modalImg");
+            const closeBtn = document.querySelector(".modal-close");
+            const zoomableImages = document.querySelectorAll(".zoomable");
+
+            zoomableImages.forEach(img => {
+                img.addEventListener("click", function () {
+                    modal.style.display = "flex";
+                    modalImg.src = this.src;
+                });
+            });
+
+            closeBtn.addEventListener("click", function () {
+                modal.style.display = "none";
+            });
+
+            modal.addEventListener("click", function (e) {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            // Tratamento de atalhos de teclado para o modal
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && modal.style.display === "flex") {
+                    modal.style.display = "none";
+                }
+            });
+
+            // Garantir que todos os áudios parem quando outro áudio/vídeo começar a tocar
+            const mediaElements = document.querySelectorAll("audio, video");
+            mediaElements.forEach(media => {
+                media.addEventListener("play", function () {
+                    mediaElements.forEach(otherMedia => {
+                        if (otherMedia !== media && !otherMedia.paused) {
+                            otherMedia.pause();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

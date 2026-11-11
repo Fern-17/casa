@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria Offline</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            padding: 20px;
+        }
+        h1 { text-align: center; margin-bottom: 30px; font-size: 2rem; }
+        h2 { margin: 30px 0 15px 0; font-size: 1.4rem; border-bottom: 2px solid #333; padding-bottom: 5px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .card {
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            aspect-ratio: 1 / 1;
+        }
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .card img, .card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .icon-play {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px; height: 48px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none;
+        }
+        .icon-play::after {
+            content: ""; display: block;
+            width: 0; height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 16px solid #fff;
+            margin-left: 4px;
+        }
+        .modal {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            max-width: 85%; max-height: 85vh;
+            border-radius: 4px; outline: none;
+        }
+        .close {
+            position: absolute; top: 20px; right: 30px;
+            color: #fff; font-size: 40px; font-weight: bold;
+            cursor: pointer; z-index: 1001;
+        }
+        .nav-btn {
+            position: absolute; top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff; border: none; font-size: 30px;
+            padding: 15px 20px; cursor: pointer;
+            border-radius: 4px; z-index: 1001;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+    </style>
+
+    <style id="estilo-padrao">
+        :root {
+            color-scheme: light;
+            --cor-fundo: #f4f6f8;
+            --cor-superficie: #ffffff;
+            --cor-texto: #202a35;
+            --cor-secundaria: #586574;
+            --cor-primaria: #24476a;
+            --cor-primaria-hover: #183550;
+            --cor-borda: #d8dee6;
+            --sombra: 0 2px 8px rgba(20, 35, 50, .07);
+            --raio: 6px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background: var(--cor-fundo);
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            background: var(--cor-fundo);
+            color: var(--cor-texto);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        body > nav,
+        body > h1,
+        body > h2,
+        body > h3,
+        body > p,
+        body > ul,
+        body > ol,
+        body > section,
+        body > main,
+        body > .container {
+            max-width: 1080px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        nav {
+            margin: 0 auto 28px;
+            padding: 12px 18px;
+            background: var(--cor-superficie);
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+        }
+
+        nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 22px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav a,
+        a {
+            color: var(--cor-primaria);
+            text-decoration: none;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 5px 0;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: var(--cor-primaria-hover);
+            text-decoration: underline;
+        }
+
+        h1, h2, h3, h4 {
+            color: #1d2b39;
+            line-height: 1.25;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-size: clamp(1.7rem, 3vw, 2.25rem);
+        }
+
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--cor-borda);
+            font-size: 1.4rem;
+        }
+
+        h3 {
+            margin-top: 22px;
+            font-size: 1.12rem;
+        }
+
+        p, li {
+            color: var(--cor-texto);
+        }
+
+        p {
+            margin: 0 0 16px;
+        }
+
+        ul, ol {
+            padding-left: 26px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        img, video, iframe {
+            max-width: 100%;
+        }
+
+        img {
+            height: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--cor-superficie);
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid var(--cor-borda);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #edf1f5;
+            font-weight: 700;
+        }
+
+        button, .btn-link {
+            padding: 9px 15px;
+            border: 1px solid var(--cor-primaria);
+            border-radius: 4px;
+            background: var(--cor-primaria);
+            color: #fff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover, .btn-link:hover {
+            background: var(--cor-primaria-hover);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        input, select, textarea {
+            max-width: 100%;
+            padding: 9px 10px;
+            border: 1px solid #bdc7d2;
+            border-radius: 4px;
+            background: #fff;
+            color: var(--cor-texto);
+            font: inherit;
+        }
+
+        :focus-visible {
+            outline: 3px solid rgba(36, 71, 106, .28);
+            outline-offset: 2px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--cor-borda);
+            margin: 24px 0;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            nav {
+                padding: 10px 12px;
+            }
+
+            nav ul {
+                gap: 6px 14px;
+            }
+
+            h1 {
+                margin-bottom: 18px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: #fff;
+                color: #000;
+            }
+
+            nav {
+                display: none;
+            }
+
+            a {
+                color: #000;
+                text-decoration: underline;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Galeria de Mídias</h1>
+    <h2>Vídeos</h2>
+    <div class="grid">
+        <div class="card" onclick="abrirModalPorSrc('midias/03_web.mp4')">
+            <video src="midias/03_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/1.mp4')">
+            <video src="midias/1.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260304_193353_web.mp4')">
+            <video src="midias/20260304_193353_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260304_194841_web.mp4')">
+            <video src="midias/20260304_194841_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260304_195033_web.mp4')">
+            <video src="midias/20260304_195033_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260304_195140_web.mp4')">
+            <video src="midias/20260304_195140_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_060941_web.mp4')">
+            <video src="midias/20260305_060941_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_190807_web.mp4')">
+            <video src="midias/20260305_190807_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_222246_web.mp4')">
+            <video src="midias/20260305_222246_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_222516_web.mp4')">
+            <video src="midias/20260305_222516_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_222846_web.mp4')">
+            <video src="midias/20260305_222846_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260306_072601_web.mp4')">
+            <video src="midias/20260306_072601_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260306_072646_web.mp4')">
+            <video src="midias/20260306_072646_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260306_202545_web.mp4')">
+            <video src="midias/20260306_202545_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260308_202730_web.mp4')">
+            <video src="midias/20260308_202730_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260309_073525_web.mp4')">
+            <video src="midias/20260309_073525_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260309_183316_web.mp4')">
+            <video src="midias/20260309_183316_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260312_222604_web.mp4')">
+            <video src="midias/20260312_222604_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260313_073106_web.mp4')">
+            <video src="midias/20260313_073106_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260313_073611_web.mp4')">
+            <video src="midias/20260313_073611_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260316_073831_web.mp4')">
+            <video src="midias/20260316_073831_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260323_195827_web.mp4')">
+            <video src="midias/20260323_195827_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260327_183518_web.mp4')">
+            <video src="midias/20260327_183518_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260329_150301_web.mp4')">
+            <video src="midias/20260329_150301_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260331_091044_web.mp4')">
+            <video src="midias/20260331_091044_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260406_182457_web.mp4')">
+            <video src="midias/20260406_182457_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260423_183639_web.mp4')">
+            <video src="midias/20260423_183639_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260831_192653_web.mp4')">
+            <video src="midias/20260831_192653_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261012_111942_web.mp4')">
+            <video src="midias/20261012_111942_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261028_191334_web.mp4')">
+            <video src="midias/20261028_191334_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261028_191416_web.mp4')">
+            <video src="midias/20261028_191416_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/VID-20251217-WA0021_web.mp4')">
+            <video src="midias/VID-20251217-WA0021_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/VID-20260106-WA0009_web.mp4')">
+            <video src="midias/VID-20260106-WA0009_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/VID-20260206-WA0007_web.mp4')">
+            <video src="midias/VID-20260206-WA0007_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/VID-20260206-WA0015_web.mp4')">
+            <video src="midias/VID-20260206-WA0015_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/Vídeo de Fernando_web.mp4')">
+            <video src="midias/Vídeo de Fernando_web.mp4#t=0.5" preload="metadata" muted></video>
+            <div class="icon-play"></div>
+        </div>
+    </div>
+    <h2>Imagens</h2>
+    <div class="grid">
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_223125.jpg')">
+            <img src="midias/20260305_223125.jpg" alt="20260305_223125.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_232549.jpg')">
+            <img src="midias/20260305_232549.jpg" alt="20260305_232549.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_232628.jpg')">
+            <img src="midias/20260305_232628.jpg" alt="20260305_232628.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260305_232745.jpg')">
+            <img src="midias/20260305_232745.jpg" alt="20260305_232745.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260306_065745.jpg')">
+            <img src="midias/20260306_065745.jpg" alt="20260306_065745.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260306_074345.jpg')">
+            <img src="midias/20260306_074345.jpg" alt="20260306_074345.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260306_193701.jpg')">
+            <img src="midias/20260306_193701.jpg" alt="20260306_193701.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260309_074824.jpg')">
+            <img src="midias/20260309_074824.jpg" alt="20260309_074824.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260309_075709.jpg')">
+            <img src="midias/20260309_075709.jpg" alt="20260309_075709.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260318_070736.jpg')">
+            <img src="midias/20260318_070736.jpg" alt="20260318_070736.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260318_182547.jpg')">
+            <img src="midias/20260318_182547.jpg" alt="20260318_182547.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260318_182625.jpg')">
+            <img src="midias/20260318_182625.jpg" alt="20260318_182625.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260318_182632.jpg')">
+            <img src="midias/20260318_182632.jpg" alt="20260318_182632.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260318_182655.jpg')">
+            <img src="midias/20260318_182655.jpg" alt="20260318_182655.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260319_073912.jpg')">
+            <img src="midias/20260319_073912.jpg" alt="20260319_073912.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260319_190318.jpg')">
+            <img src="midias/20260319_190318.jpg" alt="20260319_190318.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260321_163417.jpg')">
+            <img src="midias/20260321_163417.jpg" alt="20260321_163417.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260321_163439.jpg')">
+            <img src="midias/20260321_163439.jpg" alt="20260321_163439.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260321_163447.jpg')">
+            <img src="midias/20260321_163447.jpg" alt="20260321_163447.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260321_163451.jpg')">
+            <img src="midias/20260321_163451.jpg" alt="20260321_163451.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260321_163638.jpg')">
+            <img src="midias/20260321_163638.jpg" alt="20260321_163638.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260322_233201.jpg')">
+            <img src="midias/20260322_233201.jpg" alt="20260322_233201.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260322_233206.jpg')">
+            <img src="midias/20260322_233206.jpg" alt="20260322_233206.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260327_184121.jpg')">
+            <img src="midias/20260327_184121.jpg" alt="20260327_184121.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260331_092234.jpg')">
+            <img src="midias/20260331_092234.jpg" alt="20260331_092234.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260331_092250.jpg')">
+            <img src="midias/20260331_092250.jpg" alt="20260331_092250.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260417_072055.jpg')">
+            <img src="midias/20260417_072055.jpg" alt="20260417_072055.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260417_072105.jpg')">
+            <img src="midias/20260417_072105.jpg" alt="20260417_072105.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260423_183917.jpg')">
+            <img src="midias/20260423_183917.jpg" alt="20260423_183917.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260502_123408.jpg')">
+            <img src="midias/20260502_123408.jpg" alt="20260502_123408.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260504_234223.jpg')">
+            <img src="midias/20260504_234223.jpg" alt="20260504_234223.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260505_204135.jpg')">
+            <img src="midias/20260505_204135.jpg" alt="20260505_204135.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260505_204144.jpg')">
+            <img src="midias/20260505_204144.jpg" alt="20260505_204144.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260507_183119.jpg')">
+            <img src="midias/20260507_183119.jpg" alt="20260507_183119.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260513_234101.jpg')">
+            <img src="midias/20260513_234101.jpg" alt="20260513_234101.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260521_230647.jpg')">
+            <img src="midias/20260521_230647.jpg" alt="20260521_230647.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260521_230655.jpg')">
+            <img src="midias/20260521_230655.jpg" alt="20260521_230655.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260604_172713.jpg')">
+            <img src="midias/20260604_172713.jpg" alt="20260604_172713.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_101228.jpg')">
+            <img src="midias/20260614_101228.jpg" alt="20260614_101228.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_101321.jpg')">
+            <img src="midias/20260614_101321.jpg" alt="20260614_101321.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102414.jpg')">
+            <img src="midias/20260614_102414.jpg" alt="20260614_102414.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102525.jpg')">
+            <img src="midias/20260614_102525.jpg" alt="20260614_102525.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102609.jpg')">
+            <img src="midias/20260614_102609.jpg" alt="20260614_102609.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102620.jpg')">
+            <img src="midias/20260614_102620.jpg" alt="20260614_102620.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102651.jpg')">
+            <img src="midias/20260614_102651.jpg" alt="20260614_102651.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102810.jpg')">
+            <img src="midias/20260614_102810.jpg" alt="20260614_102810.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102919.jpg')">
+            <img src="midias/20260614_102919.jpg" alt="20260614_102919.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_102956.jpg')">
+            <img src="midias/20260614_102956.jpg" alt="20260614_102956.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_103150.jpg')">
+            <img src="midias/20260614_103150.jpg" alt="20260614_103150.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260614_103241.jpg')">
+            <img src="midias/20260614_103241.jpg" alt="20260614_103241.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260710_074937.jpg')">
+            <img src="midias/20260710_074937.jpg" alt="20260710_074937.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260710_074951.jpg')">
+            <img src="midias/20260710_074951.jpg" alt="20260710_074951.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260712_114904.jpg')">
+            <img src="midias/20260712_114904.jpg" alt="20260712_114904.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260831_190342.jpg')">
+            <img src="midias/20260831_190342.jpg" alt="20260831_190342.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260831_190347.jpg')">
+            <img src="midias/20260831_190347.jpg" alt="20260831_190347.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260922_233936.jpg')">
+            <img src="midias/20260922_233936.jpg" alt="20260922_233936.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20260924_063533.jpg')">
+            <img src="midias/20260924_063533.jpg" alt="20260924_063533.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261013_073719.jpg')">
+            <img src="midias/20261013_073719.jpg" alt="20261013_073719.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261021_205142.jpg')">
+            <img src="midias/20261021_205142.jpg" alt="20261021_205142.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261024_205048.jpg')">
+            <img src="midias/20261024_205048.jpg" alt="20261024_205048.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261024_205104.jpg')">
+            <img src="midias/20261024_205104.jpg" alt="20261024_205104.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/20261024_205121.jpg')">
+            <img src="midias/20261024_205121.jpg" alt="20261024_205121.jpg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/IMG-20251111-WA0004.jpeg')">
+            <img src="midias/IMG-20251111-WA0004.jpeg" alt="IMG-20251111-WA0004.jpeg" loading="lazy">
+        </div>
+        <div class="card" onclick="abrirModalPorSrc('midias/IMG-20251217-WA0019.jpeg')">
+            <img src="midias/IMG-20251217-WA0019.jpeg" alt="IMG-20251217-WA0019.jpeg" loading="lazy">
+        </div>
+    </div>
+
+    <div id="modal" class="modal" onclick="fecharModal(event)">
+        <span class="close" onclick="fecharModalDirect()">&times;</span>
+        <button class="nav-btn prev-btn" onclick="mudarMidia(-1)">&#10094;</button>
+        <button class="nav-btn next-btn" onclick="mudarMidia(1)">&#10095;</button>
+        <div id="modal-body"></div>
+    </div>
+
+    <script>
+        const galeriaMidias = [{"tipo": "video", "src": "midias/03_web.mp4", "nome": "03_web.mp4"}, {"tipo": "video", "src": "midias/1.mp4", "nome": "1.mp4"}, {"tipo": "video", "src": "midias/20260304_193353_web.mp4", "nome": "20260304_193353_web.mp4"}, {"tipo": "video", "src": "midias/20260304_194841_web.mp4", "nome": "20260304_194841_web.mp4"}, {"tipo": "video", "src": "midias/20260304_195033_web.mp4", "nome": "20260304_195033_web.mp4"}, {"tipo": "video", "src": "midias/20260304_195140_web.mp4", "nome": "20260304_195140_web.mp4"}, {"tipo": "video", "src": "midias/20260305_060941_web.mp4", "nome": "20260305_060941_web.mp4"}, {"tipo": "video", "src": "midias/20260305_190807_web.mp4", "nome": "20260305_190807_web.mp4"}, {"tipo": "video", "src": "midias/20260305_222246_web.mp4", "nome": "20260305_222246_web.mp4"}, {"tipo": "video", "src": "midias/20260305_222516_web.mp4", "nome": "20260305_222516_web.mp4"}, {"tipo": "video", "src": "midias/20260305_222846_web.mp4", "nome": "20260305_222846_web.mp4"}, {"tipo": "video", "src": "midias/20260306_072601_web.mp4", "nome": "20260306_072601_web.mp4"}, {"tipo": "video", "src": "midias/20260306_072646_web.mp4", "nome": "20260306_072646_web.mp4"}, {"tipo": "video", "src": "midias/20260306_202545_web.mp4", "nome": "20260306_202545_web.mp4"}, {"tipo": "video", "src": "midias/20260308_202730_web.mp4", "nome": "20260308_202730_web.mp4"}, {"tipo": "video", "src": "midias/20260309_073525_web.mp4", "nome": "20260309_073525_web.mp4"}, {"tipo": "video", "src": "midias/20260309_183316_web.mp4", "nome": "20260309_183316_web.mp4"}, {"tipo": "video", "src": "midias/20260312_222604_web.mp4", "nome": "20260312_222604_web.mp4"}, {"tipo": "video", "src": "midias/20260313_073106_web.mp4", "nome": "20260313_073106_web.mp4"}, {"tipo": "video", "src": "midias/20260313_073611_web.mp4", "nome": "20260313_073611_web.mp4"}, {"tipo": "video", "src": "midias/20260316_073831_web.mp4", "nome": "20260316_073831_web.mp4"}, {"tipo": "video", "src": "midias/20260323_195827_web.mp4", "nome": "20260323_195827_web.mp4"}, {"tipo": "video", "src": "midias/20260327_183518_web.mp4", "nome": "20260327_183518_web.mp4"}, {"tipo": "video", "src": "midias/20260329_150301_web.mp4", "nome": "20260329_150301_web.mp4"}, {"tipo": "video", "src": "midias/20260331_091044_web.mp4", "nome": "20260331_091044_web.mp4"}, {"tipo": "video", "src": "midias/20260406_182457_web.mp4", "nome": "20260406_182457_web.mp4"}, {"tipo": "video", "src": "midias/20260423_183639_web.mp4", "nome": "20260423_183639_web.mp4"}, {"tipo": "video", "src": "midias/20260831_192653_web.mp4", "nome": "20260831_192653_web.mp4"}, {"tipo": "video", "src": "midias/20261012_111942_web.mp4", "nome": "20261012_111942_web.mp4"}, {"tipo": "video", "src": "midias/20261028_191334_web.mp4", "nome": "20261028_191334_web.mp4"}, {"tipo": "video", "src": "midias/20261028_191416_web.mp4", "nome": "20261028_191416_web.mp4"}, {"tipo": "video", "src": "midias/VID-20251217-WA0021_web.mp4", "nome": "VID-20251217-WA0021_web.mp4"}, {"tipo": "video", "src": "midias/VID-20260106-WA0009_web.mp4", "nome": "VID-20260106-WA0009_web.mp4"}, {"tipo": "video", "src": "midias/VID-20260206-WA0007_web.mp4", "nome": "VID-20260206-WA0007_web.mp4"}, {"tipo": "video", "src": "midias/VID-20260206-WA0015_web.mp4", "nome": "VID-20260206-WA0015_web.mp4"}, {"tipo": "video", "src": "midias/V\u00eddeo de Fernando_web.mp4", "nome": "V\u00eddeo de Fernando_web.mp4"}, {"tipo": "imagem", "src": "midias/20260305_223125.jpg", "nome": "20260305_223125.jpg"}, {"tipo": "imagem", "src": "midias/20260305_232549.jpg", "nome": "20260305_232549.jpg"}, {"tipo": "imagem", "src": "midias/20260305_232628.jpg", "nome": "20260305_232628.jpg"}, {"tipo": "imagem", "src": "midias/20260305_232745.jpg", "nome": "20260305_232745.jpg"}, {"tipo": "imagem", "src": "midias/20260306_065745.jpg", "nome": "20260306_065745.jpg"}, {"tipo": "imagem", "src": "midias/20260306_074345.jpg", "nome": "20260306_074345.jpg"}, {"tipo": "imagem", "src": "midias/20260306_193701.jpg", "nome": "20260306_193701.jpg"}, {"tipo": "imagem", "src": "midias/20260309_074824.jpg", "nome": "20260309_074824.jpg"}, {"tipo": "imagem", "src": "midias/20260309_075709.jpg", "nome": "20260309_075709.jpg"}, {"tipo": "imagem", "src": "midias/20260318_070736.jpg", "nome": "20260318_070736.jpg"}, {"tipo": "imagem", "src": "midias/20260318_182547.jpg", "nome": "20260318_182547.jpg"}, {"tipo": "imagem", "src": "midias/20260318_182625.jpg", "nome": "20260318_182625.jpg"}, {"tipo": "imagem", "src": "midias/20260318_182632.jpg", "nome": "20260318_182632.jpg"}, {"tipo": "imagem", "src": "midias/20260318_182655.jpg", "nome": "20260318_182655.jpg"}, {"tipo": "imagem", "src": "midias/20260319_073912.jpg", "nome": "20260319_073912.jpg"}, {"tipo": "imagem", "src": "midias/20260319_190318.jpg", "nome": "20260319_190318.jpg"}, {"tipo": "imagem", "src": "midias/20260321_163417.jpg", "nome": "20260321_163417.jpg"}, {"tipo": "imagem", "src": "midias/20260321_163439.jpg", "nome": "20260321_163439.jpg"}, {"tipo": "imagem", "src": "midias/20260321_163447.jpg", "nome": "20260321_163447.jpg"}, {"tipo": "imagem", "src": "midias/20260321_163451.jpg", "nome": "20260321_163451.jpg"}, {"tipo": "imagem", "src": "midias/20260321_163638.jpg", "nome": "20260321_163638.jpg"}, {"tipo": "imagem", "src": "midias/20260322_233201.jpg", "nome": "20260322_233201.jpg"}, {"tipo": "imagem", "src": "midias/20260322_233206.jpg", "nome": "20260322_233206.jpg"}, {"tipo": "imagem", "src": "midias/20260327_184121.jpg", "nome": "20260327_184121.jpg"}, {"tipo": "imagem", "src": "midias/20260331_092234.jpg", "nome": "20260331_092234.jpg"}, {"tipo": "imagem", "src": "midias/20260331_092250.jpg", "nome": "20260331_092250.jpg"}, {"tipo": "imagem", "src": "midias/20260417_072055.jpg", "nome": "20260417_072055.jpg"}, {"tipo": "imagem", "src": "midias/20260417_072105.jpg", "nome": "20260417_072105.jpg"}, {"tipo": "imagem", "src": "midias/20260423_183917.jpg", "nome": "20260423_183917.jpg"}, {"tipo": "imagem", "src": "midias/20260502_123408.jpg", "nome": "20260502_123408.jpg"}, {"tipo": "imagem", "src": "midias/20260504_234223.jpg", "nome": "20260504_234223.jpg"}, {"tipo": "imagem", "src": "midias/20260505_204135.jpg", "nome": "20260505_204135.jpg"}, {"tipo": "imagem", "src": "midias/20260505_204144.jpg", "nome": "20260505_204144.jpg"}, {"tipo": "imagem", "src": "midias/20260507_183119.jpg", "nome": "20260507_183119.jpg"}, {"tipo": "imagem", "src": "midias/20260513_234101.jpg", "nome": "20260513_234101.jpg"}, {"tipo": "imagem", "src": "midias/20260521_230647.jpg", "nome": "20260521_230647.jpg"}, {"tipo": "imagem", "src": "midias/20260521_230655.jpg", "nome": "20260521_230655.jpg"}, {"tipo": "imagem", "src": "midias/20260604_172713.jpg", "nome": "20260604_172713.jpg"}, {"tipo": "imagem", "src": "midias/20260614_101228.jpg", "nome": "20260614_101228.jpg"}, {"tipo": "imagem", "src": "midias/20260614_101321.jpg", "nome": "20260614_101321.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102414.jpg", "nome": "20260614_102414.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102525.jpg", "nome": "20260614_102525.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102609.jpg", "nome": "20260614_102609.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102620.jpg", "nome": "20260614_102620.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102651.jpg", "nome": "20260614_102651.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102810.jpg", "nome": "20260614_102810.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102919.jpg", "nome": "20260614_102919.jpg"}, {"tipo": "imagem", "src": "midias/20260614_102956.jpg", "nome": "20260614_102956.jpg"}, {"tipo": "imagem", "src": "midias/20260614_103150.jpg", "nome": "20260614_103150.jpg"}, {"tipo": "imagem", "src": "midias/20260614_103241.jpg", "nome": "20260614_103241.jpg"}, {"tipo": "imagem", "src": "midias/20260710_074937.jpg", "nome": "20260710_074937.jpg"}, {"tipo": "imagem", "src": "midias/20260710_074951.jpg", "nome": "20260710_074951.jpg"}, {"tipo": "imagem", "src": "midias/20260712_114904.jpg", "nome": "20260712_114904.jpg"}, {"tipo": "imagem", "src": "midias/20260831_190342.jpg", "nome": "20260831_190342.jpg"}, {"tipo": "imagem", "src": "midias/20260831_190347.jpg", "nome": "20260831_190347.jpg"}, {"tipo": "imagem", "src": "midias/20260922_233936.jpg", "nome": "20260922_233936.jpg"}, {"tipo": "imagem", "src": "midias/20260924_063533.jpg", "nome": "20260924_063533.jpg"}, {"tipo": "imagem", "src": "midias/20261013_073719.jpg", "nome": "20261013_073719.jpg"}, {"tipo": "imagem", "src": "midias/20261021_205142.jpg", "nome": "20261021_205142.jpg"}, {"tipo": "imagem", "src": "midias/20261024_205048.jpg", "nome": "20261024_205048.jpg"}, {"tipo": "imagem", "src": "midias/20261024_205104.jpg", "nome": "20261024_205104.jpg"}, {"tipo": "imagem", "src": "midias/20261024_205121.jpg", "nome": "20261024_205121.jpg"}, {"tipo": "imagem", "src": "midias/IMG-20251111-WA0004.jpeg", "nome": "IMG-20251111-WA0004.jpeg"}, {"tipo": "imagem", "src": "midias/IMG-20251217-WA0019.jpeg", "nome": "IMG-20251217-WA0019.jpeg"}];
+        let indiceAtual = 0;
+
+        function abrirModalPorSrc(src) {
+            indiceAtual = galeriaMidias.findIndex(m => m.src === src);
+            if (indiceAtual === -1) indiceAtual = 0;
+            renderizarModal();
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function renderizarModal() {
+            const body = document.getElementById('modal-body');
+            const item = galeriaMidias[indiceAtual];
+            
+            if (item.tipo === 'imagem') {
+                body.innerHTML = `<img src="${item.src}" class="modal-content">`;
+            } else if (item.tipo === 'video') {
+                body.innerHTML = `<video src="${item.src}" class="modal-content" controls autoplay></video>`;
+            }
+        }
+
+        function mudarMidia(direcao) {
+            indiceAtual += direcao;
+            if (indiceAtual < 0) {
+                indiceAtual = galeriaMidias.length - 1;
+            } else if (indiceAtual >= galeriaMidias.length) {
+                indiceAtual = 0;
+            }
+            renderizarModal();
+        }
+
+        function fecharModal(event) {
+            if (event.target.id === 'modal') {
+                fecharModalDirect();
+            }
+        }
+
+        function fecharModalDirect() {
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = '';
+            modal.style.display = 'none';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('modal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    fecharModalDirect();
+                } else if (e.key === 'ArrowLeft') {
+                    mudarMidia(-1);
+                } else if (e.key === 'ArrowRight') {
+                    mudarMidia(1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

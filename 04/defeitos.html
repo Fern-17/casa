@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>defeitos</title>
+
+    <style id="estilo-padrao">
+        :root {
+            color-scheme: light;
+            --cor-fundo: #f4f6f8;
+            --cor-superficie: #ffffff;
+            --cor-texto: #202a35;
+            --cor-secundaria: #586574;
+            --cor-primaria: #24476a;
+            --cor-primaria-hover: #183550;
+            --cor-borda: #d8dee6;
+            --sombra: 0 2px 8px rgba(20, 35, 50, .07);
+            --raio: 6px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background: var(--cor-fundo);
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            background: var(--cor-fundo);
+            color: var(--cor-texto);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        body > nav,
+        body > h1,
+        body > h2,
+        body > h3,
+        body > p,
+        body > ul,
+        body > ol,
+        body > section,
+        body > main,
+        body > .container {
+            max-width: 1080px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        nav {
+            margin: 0 auto 28px;
+            padding: 12px 18px;
+            background: var(--cor-superficie);
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+        }
+
+        nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 22px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        nav a,
+        a {
+            color: var(--cor-primaria);
+            text-decoration: none;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 5px 0;
+            font-weight: 600;
+        }
+
+        a:hover {
+            color: var(--cor-primaria-hover);
+            text-decoration: underline;
+        }
+
+        h1, h2, h3, h4 {
+            color: #1d2b39;
+            line-height: 1.25;
+            font-weight: 700;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-size: clamp(1.7rem, 3vw, 2.25rem);
+        }
+
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--cor-borda);
+            font-size: 1.4rem;
+        }
+
+        h3 {
+            margin-top: 22px;
+            font-size: 1.12rem;
+        }
+
+        p, li {
+            color: var(--cor-texto);
+        }
+
+        p {
+            margin: 0 0 16px;
+        }
+
+        ul, ol {
+            padding-left: 26px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        img, video, iframe {
+            max-width: 100%;
+        }
+
+        img {
+            height: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--cor-superficie);
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid var(--cor-borda);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #edf1f5;
+            font-weight: 700;
+        }
+
+        button, .btn-link {
+            padding: 9px 15px;
+            border: 1px solid var(--cor-primaria);
+            border-radius: 4px;
+            background: var(--cor-primaria);
+            color: #fff;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover, .btn-link:hover {
+            background: var(--cor-primaria-hover);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        input, select, textarea {
+            max-width: 100%;
+            padding: 9px 10px;
+            border: 1px solid #bdc7d2;
+            border-radius: 4px;
+            background: #fff;
+            color: var(--cor-texto);
+            font: inherit;
+        }
+
+        :focus-visible {
+            outline: 3px solid rgba(36, 71, 106, .28);
+            outline-offset: 2px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--cor-borda);
+            margin: 24px 0;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            nav {
+                padding: 10px 12px;
+            }
+
+            nav ul {
+                gap: 6px 14px;
+            }
+
+            h1 {
+                margin-bottom: 18px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: #fff;
+                color: #000;
+            }
+
+            nav {
+                display: none;
+            }
+
+            a {
+                color: #000;
+                text-decoration: underline;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="../index.html">Início</a></li>
+             <li><a href="../galeria.html">Imagens</a> </li>
+            <li><a href="../02/thiago/" target="_blank">Conversa com Thiago </a></li>
+            <li><a href="../02/alberto/index.html" target="_blank">Conversa com Alberto </a></li>
+            <li><a href="../02/paulo/" target="_blank">Conversa com Paulo </a></li>
+                     
+         
+        </ul>
+    </nav>
+    
+    <h1>Apenas listando alguns defeitos</h1>
+    <ul>
+        <li>Não foi entregue a planta baixa da casa;</li>
+        <li>Não foi entregue a planta elétrica da casa;</li>
+        <li>Não foi entregue a planta hidráulica da casas;</li>
+        <li>Cai fezes, ossos de ratos e sujeira do forro do teto pelas beiradas;</li>
+        <li>Baixa vazão de água na pia da cozinha e banheiro;</li>
+        <li>Paredes apresentando fissuras horizontais e verticais;</li>
+        <li>Forro do teto, rachando, furado e manchado;</li>
+        <li>Caixa de descarga vazando;</li>
+        <li>Marcas d'água nas bordas da janela devido a chuva que escorre por elas;</li>
+        <li>Entra água da chuva pela porta da frente e pela porta da cozinha;</li>
+        <li>Mal acabamento na coluna do tanque no quintal;</li>
+        <li>usência de iluminação no quintal/área de serviço;</li>
+        <li>Cerca elétrica faltando uma parte e inoperante;</li>
+        <li>Área coberta por azulejos, porém oca na parede atrás do armário;</li>
+        <li>Cerâmica trincada e aparentemente mal colocada, causando fragilidade;</li>
+        <li>Piso da área externa irregular em alguns pontos devido ao cimento que caia durante a construção da casa ao lado;</li>
+        <li>Falta de rejunte em alguns pontos;</li>
+        <li>Afiação da cerca elétrica do outro imóvel para dentro do meu imóvel;</li>
+        <li>Paredes e portas com defeitos de pintura;</li>
+        <li>Portas "machucadas", com marcas e furos;</li>
+ 
+    </ul>
+
+
+</body>
+</html>
